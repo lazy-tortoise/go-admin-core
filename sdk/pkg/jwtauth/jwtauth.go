@@ -226,6 +226,9 @@ var (
 
 	// RoleKey 部门名称
 	DeptName     = "deptName"
+
+	// 租户编号
+	TenantId =  "tenantId"
 )
 
 // New for check error with GinJWTMiddleware

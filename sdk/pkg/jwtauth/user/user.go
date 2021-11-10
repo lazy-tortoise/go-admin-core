@@ -27,6 +27,15 @@ func Get(c *gin.Context, key string) interface{} {
 	return nil
 }
 
+func GetTenantId(c *gin.Context) int {
+	data := ExtractClaims(c)
+	if data["identity"] != nil {
+		return int((data["identity"]).(float64))
+	}
+	fmt.Println(pkg.GetCurrentTimeStr() + " [WARING] " + c.Request.Method + " " + c.Request.URL.Path + " GetUserId 缺少 identity")
+	return 0
+}
+
 func GetUserId(c *gin.Context) int {
 	data := ExtractClaims(c)
 	if data["identity"] != nil {
@@ -35,6 +44,7 @@ func GetUserId(c *gin.Context) int {
 	fmt.Println(pkg.GetCurrentTimeStr() + " [WARING] " + c.Request.Method + " " + c.Request.URL.Path + " GetUserId 缺少 identity")
 	return 0
 }
+
 
 func GetUserIdStr(c *gin.Context) string {
 	data := ExtractClaims(c)
