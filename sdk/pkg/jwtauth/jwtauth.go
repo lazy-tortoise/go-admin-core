@@ -90,6 +90,9 @@ type GinJWTMiddleware struct {
 	// roleName
 	RoleNameKey string
 
+	// domain_key
+	DomainKey string
+
 	// TokenLookup is a string in the form of "<source>:<name>" that is used
 	// to extract token from the request.
 	// Optional. Default value "header:Authorization".
@@ -227,8 +230,8 @@ var (
 	// RoleKey 部门名称
 	DeptName     = "deptName"
 
-	// 租户编号
-	TenantId =  "tenantId"
+	// 租户号
+	TenantNo =  "tenantno"
 )
 
 // New for check error with GinJWTMiddleware

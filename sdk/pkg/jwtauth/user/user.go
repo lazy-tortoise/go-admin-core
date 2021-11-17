@@ -27,13 +27,14 @@ func Get(c *gin.Context, key string) interface{} {
 	return nil
 }
 
-func GetTenantId(c *gin.Context) int {
+//TODO 应该利用这个进行租户号确定
+func GetTenantNo(c *gin.Context) string {
 	data := ExtractClaims(c)
-	if data["identity"] != nil {
-		return int((data["identity"]).(float64))
+	if data["tenantno"] != nil {
+		return ((data["tenantno"]).(string))
 	}
-	fmt.Println(pkg.GetCurrentTimeStr() + " [WARING] " + c.Request.Method + " " + c.Request.URL.Path + " GetUserId 缺少 identity")
-	return 0
+	fmt.Println(pkg.GetCurrentTimeStr() + " [WARING] " + c.Request.Method + " " + c.Request.URL.Path + " GetUserId 缺少 tenantno")
+	return ""
 }
 
 func GetUserId(c *gin.Context) int {

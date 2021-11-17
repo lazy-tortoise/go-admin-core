@@ -16,6 +16,7 @@
 
 # idea
 /.idea
+/vendor
 
 /plugins/logger/zap/testdata/*
 go.sum
