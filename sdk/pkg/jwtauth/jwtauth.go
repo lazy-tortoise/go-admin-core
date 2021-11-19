@@ -216,22 +216,25 @@ var (
 	RKey = "r"
 
 	// RoleIdKey 角色id  Old
-	RoleIdKey   = "roleid"
+	RoleIdKey = "roleid"
 
 	// RoleKey 角色名称  Old
-	RoleKey     = "rolekey"
+	RoleKey = "rolekey"
 
 	// RoleNameKey 角色名称  Old
 	RoleNameKey = "rolename"
 
 	// RoleIdKey 部门id
-	DeptId   = "deptId"
+	DeptId = "deptId"
 
 	// RoleKey 部门名称
-	DeptName     = "deptName"
+	DeptName = "deptName"
+
+	//租户编号
+	TenantId = "tenantId"
 
 	// 租户号
-	TenantNo =  "tenantno"
+	TenantNo = "tenantNo"
 )
 
 // New for check error with GinJWTMiddleware
