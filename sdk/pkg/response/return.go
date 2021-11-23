@@ -11,7 +11,7 @@ import (
 var Default = &response{}
 
 // Error 失败数据处理
-func Error(c *gin.Context, code int, err error, msg string) {
+func Error(c *gin.Context, code string, err error, msg string) {
 	res := Default.Clone()
 	if err != nil {
 		res.SetMsg(err.Error())
@@ -20,7 +20,7 @@ func Error(c *gin.Context, code int, err error, msg string) {
 		res.SetMsg(msg)
 	}
 	res.SetTraceID(pkg.GenerateMsgIDFromContext(c))
-	res.SetCode(int32(code))
+	res.SetCode(code)
 	res.SetSuccess(false)
 	c.Set("result", res)
 	c.Set("status", code)
@@ -36,7 +36,7 @@ func OK(c *gin.Context, data interface{}, msg string) {
 		res.SetMsg(msg)
 	}
 	res.SetTraceID(pkg.GenerateMsgIDFromContext(c))
-	res.SetCode(http.StatusOK)
+	res.SetCode(ResCodeOk)
 	c.Set("result", res)
 	c.Set("status", http.StatusOK)
 	c.AbortWithStatusJSON(http.StatusOK, res)

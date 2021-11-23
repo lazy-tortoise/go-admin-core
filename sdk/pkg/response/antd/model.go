@@ -29,10 +29,10 @@ type response struct {
 
 type Pages struct {
 	Response
-	Data interface{} `json:"data,omitempty"` // response data
-	Total    int `json:"total,omitempty"`
-	Current  int `json:"current,omitempty"`
-	PageSize int `json:"pageSize,omitempty"`
+	Data     interface{} `json:"data,omitempty"` // response data
+	Total    int         `json:"total,omitempty"`
+	Current  int         `json:"current,omitempty"`
+	PageSize int         `json:"pageSize,omitempty"`
 }
 
 type pages struct {
@@ -40,9 +40,9 @@ type pages struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
-func (e *response) SetCode(code int32) {
+func (e *response) SetCode(code string) {
 	switch code {
-	case 200, 0:
+	case "00000", "0":
 	default:
 		e.ErrorCode = fmt.Sprintf("C%d", code)
 	}

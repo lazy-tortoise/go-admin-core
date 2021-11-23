@@ -111,7 +111,7 @@ func (e *Api) MakeService(c *service.Service) *Api {
 }
 
 // Error 通常错误数据处理
-func (e Api) Error(code int, err error, msg string) {
+func (e Api) Error(code string, err error, msg string) {
 	response.Error(e.Context, code, err, msg)
 }
 

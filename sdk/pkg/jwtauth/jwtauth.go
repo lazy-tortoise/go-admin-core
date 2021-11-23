@@ -3,6 +3,7 @@ package jwtauth
 import (
 	"crypto/rsa"
 	"errors"
+	"github.com/go-admin-team/go-admin-core/sdk/pkg/response"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -60,13 +61,13 @@ type GinJWTMiddleware struct {
 	PayloadFunc func(data interface{}) MapClaims
 
 	// User can define own Unauthorized func.
-	Unauthorized func(*gin.Context, int, string)
+	Unauthorized func(*gin.Context, string, string)
 
 	// User can define own LoginResponse func.
-	LoginResponse func(*gin.Context, int, string, time.Time)
+	LoginResponse func(*gin.Context, string, string, time.Time)
 
 	// User can define own RefreshResponse func.
-	RefreshResponse func(*gin.Context, int, string, time.Time)
+	RefreshResponse func(*gin.Context, string, string, time.Time)
 
 	// Set the identity handler function
 	IdentityHandler func(*gin.Context) interface{}
@@ -319,7 +320,7 @@ func (mw *GinJWTMiddleware) MiddlewareInit() error {
 	}
 
 	if mw.Unauthorized == nil {
-		mw.Unauthorized = func(c *gin.Context, code int, message string) {
+		mw.Unauthorized = func(c *gin.Context, code string, message string) {
 			c.JSON(http.StatusOK, gin.H{
 				"code":    code,
 				"message": message,
@@ -328,9 +329,9 @@ func (mw *GinJWTMiddleware) MiddlewareInit() error {
 	}
 
 	if mw.LoginResponse == nil {
-		mw.LoginResponse = func(c *gin.Context, code int, token string, expire time.Time) {
+		mw.LoginResponse = func(c *gin.Context, code string, token string, expire time.Time) {
 			c.JSON(http.StatusOK, gin.H{
-				"code":   http.StatusOK,
+				"code":   response.ResCodeOk,
 				"token":  token,
 				"expire": expire.Format(time.RFC3339),
 			})
@@ -338,7 +339,7 @@ func (mw *GinJWTMiddleware) MiddlewareInit() error {
 	}
 
 	if mw.RefreshResponse == nil {
-		mw.RefreshResponse = func(c *gin.Context, code int, token string, expire time.Time) {
+		mw.RefreshResponse = func(c *gin.Context, code string, token string, expire time.Time) {
 			c.JSON(http.StatusOK, gin.H{
 				"code":   http.StatusOK,
 				"token":  token,
@@ -392,21 +393,21 @@ func (mw *GinJWTMiddleware) MiddlewareFunc() gin.HandlerFunc {
 func (mw *GinJWTMiddleware) middlewareImpl(c *gin.Context) {
 	claims, err := mw.GetClaimsFromJWT(c)
 	if err != nil {
-		mw.unauthorized(c, http.StatusUnauthorized, mw.HTTPStatusMessageFunc(err, c))
+		mw.unauthorized(c, response.ResTokenError, mw.HTTPStatusMessageFunc(err, c))
 		return
 	}
 
 	if claims["exp"] == nil {
-		mw.unauthorized(c, http.StatusBadRequest, mw.HTTPStatusMessageFunc(ErrMissingExpField, c))
+		mw.unauthorized(c, response.ResTokenError, mw.HTTPStatusMessageFunc(ErrMissingExpField, c))
 		return
 	}
 
 	if _, ok := claims["exp"].(float64); !ok {
-		mw.unauthorized(c, http.StatusBadRequest, mw.HTTPStatusMessageFunc(ErrWrongFormatOfExp, c))
+		mw.unauthorized(c, response.ResTokenError, mw.HTTPStatusMessageFunc(ErrWrongFormatOfExp, c))
 		return
 	}
 	if int64(claims["exp"].(float64)) < mw.TimeFunc().Unix() {
-		mw.unauthorized(c, 6401, mw.HTTPStatusMessageFunc(ErrExpiredToken, c))
+		mw.unauthorized(c, response.ResTokenExpire, mw.HTTPStatusMessageFunc(ErrExpiredToken, c))
 		return
 	}
 
@@ -418,7 +419,7 @@ func (mw *GinJWTMiddleware) middlewareImpl(c *gin.Context) {
 	}
 
 	if !mw.Authorizator(identity, c) {
-		mw.unauthorized(c, http.StatusForbidden, mw.HTTPStatusMessageFunc(ErrForbidden, c))
+		mw.unauthorized(c, response.ResTokenError, mw.HTTPStatusMessageFunc(ErrForbidden, c))
 		return
 	}
 
@@ -452,14 +453,14 @@ func (mw *GinJWTMiddleware) GetClaimsFromJWT(c *gin.Context) (MapClaims, error) 
 // Reply will be of the form {"token": "TOKEN"}.
 func (mw *GinJWTMiddleware) LoginHandler(c *gin.Context) {
 	if mw.Authenticator == nil {
-		mw.unauthorized(c, http.StatusInternalServerError, mw.HTTPStatusMessageFunc(ErrMissingAuthenticatorFunc, c))
+		mw.unauthorized(c, response.ResSystemError, mw.HTTPStatusMessageFunc(ErrMissingAuthenticatorFunc, c))
 		return
 	}
 
 	data, err := mw.Authenticator(c)
 
 	if err != nil {
-		mw.unauthorized(c, 400, mw.HTTPStatusMessageFunc(err, c))
+		mw.unauthorized(c, response.ResClientError, mw.HTTPStatusMessageFunc(err, c))
 		return
 	}
 
@@ -479,7 +480,7 @@ func (mw *GinJWTMiddleware) LoginHandler(c *gin.Context) {
 	tokenString, err := mw.signedString(token)
 
 	if err != nil {
-		mw.unauthorized(c, http.StatusOK, mw.HTTPStatusMessageFunc(ErrFailedTokenCreation, c))
+		mw.unauthorized(c, response.ResCodeOk, mw.HTTPStatusMessageFunc(ErrFailedTokenCreation, c))
 		return
 	}
 
@@ -497,7 +498,7 @@ func (mw *GinJWTMiddleware) LoginHandler(c *gin.Context) {
 		)
 	}
 
-	mw.LoginResponse(c, http.StatusOK, tokenString, expire)
+	mw.LoginResponse(c, response.ResCodeOk, tokenString, expire)
 }
 
 func (mw *GinJWTMiddleware) signedString(token *jwt.Token) (string, error) {
@@ -517,11 +518,11 @@ func (mw *GinJWTMiddleware) signedString(token *jwt.Token) (string, error) {
 func (mw *GinJWTMiddleware) RefreshHandler(c *gin.Context) {
 	tokenString, expire, err := mw.RefreshToken(c)
 	if err != nil {
-		mw.unauthorized(c, http.StatusUnauthorized, mw.HTTPStatusMessageFunc(err, c))
+		mw.unauthorized(c, response.ResTokenError, mw.HTTPStatusMessageFunc(err, c))
 		return
 	}
 
-	mw.RefreshResponse(c, http.StatusOK, tokenString, expire)
+	mw.RefreshResponse(c, response.ResCodeOk, tokenString, expire)
 }
 
 // RefreshToken refresh token and check if token is expired
@@ -715,7 +716,7 @@ func (mw *GinJWTMiddleware) ParseTokenString(token string) (*jwt.Token, error) {
 	})
 }
 
-func (mw *GinJWTMiddleware) unauthorized(c *gin.Context, code int, message string) {
+func (mw *GinJWTMiddleware) unauthorized(c *gin.Context, code string, message string) {
 	c.Header("WWW-Authenticate", "JWT realm="+mw.Realm)
 	if !mw.DisabledAbort {
 		c.Abort()
