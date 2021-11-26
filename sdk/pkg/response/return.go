@@ -23,7 +23,7 @@ func Error(c *gin.Context, code string, err error, msg string) {
 	res.SetCode(code)
 	res.SetSuccess(false)
 	c.Set("result", res)
-	c.Set("status", code)
+	c.Set("status", http.StatusOK)
 	c.AbortWithStatusJSON(http.StatusOK, res)
 }
 
