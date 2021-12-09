@@ -50,48 +50,61 @@ func (e Cache) Connect() error {
 	//return e.store.Connect()
 }
 
+// 获取key
+func getKey(prefix, intervalTenant, key string) string {
+	cacheKey := prefix + intervalTenant + key
+	if prefix == "" {
+		cacheKey = key
+	}
+	return cacheKey
+}
+
 // Get val in cache
 func (e Cache) Get(key string) (string, error) {
-	return e.store.Get(e.prefix + intervalTenant + key)
+	cacheKey := e.prefix + intervalTenant + key
+	if e.prefix == "" {
+		cacheKey = key
+	}
+	return e.store.Get(cacheKey)
 }
 
 // Set val in cache
 func (e Cache) Set(key string, val interface{}, expire int) error {
-	return e.store.Set(e.prefix+intervalTenant+key, val, expire)
+	return e.store.Set(getKey(e.prefix, intervalTenant, key), val, expire)
 }
 
 // Del delete key in cache
 func (e Cache) Del(key string) error {
-	return e.store.Del(e.prefix + intervalTenant + key)
+	return e.store.Del(getKey(e.prefix, intervalTenant, key))
 }
 
 // HashGet get val in hashtable cache
 func (e Cache) HashGet(hk, key string) (string, error) {
-	return e.store.HashGet(hk, e.prefix+intervalTenant+key)
+	return e.store.HashGet(hk, getKey(e.prefix, intervalTenant, key))
 }
 
 // HashDel delete one key:value pair in hashtable cache
 func (e Cache) HashDel(hk, key string) error {
-	return e.store.HashDel(hk, e.prefix+intervalTenant+key)
+	return e.store.HashDel(hk, getKey(e.prefix, intervalTenant, key))
 }
 
 // Increase value
 func (e Cache) Increase(key string) error {
-	return e.store.Increase(e.prefix + intervalTenant + key)
+	return e.store.Increase(getKey(e.prefix, intervalTenant, key))
 }
 
 func (e Cache) Decrease(key string) error {
-	return e.store.Decrease(e.prefix + intervalTenant + key)
+	return e.store.Decrease(getKey(e.prefix, intervalTenant, key))
 }
 
 func (e Cache) Expire(key string, dur time.Duration) error {
-	return e.store.Expire(e.prefix+intervalTenant+key, dur)
+	return e.store.Expire(getKey(e.prefix, intervalTenant, key), dur)
 }
 
 // Token 获取微信oauth2 token
 func (e Cache) Token() (token *oauth2.Token, err error) {
 	var str string
-	str, err = e.store.Get(e.prefix + intervalTenant + e.wxTokenStoreKey)
+	str, err = e.store.Get(getKey(e.prefix, intervalTenant, e.wxTokenStoreKey))
 	if err != nil {
 		return
 	}
@@ -105,5 +118,5 @@ func (e Cache) PutToken(token *oauth2.Token) error {
 	if err != nil {
 		return err
 	}
-	return e.store.Set(e.prefix+intervalTenant+e.wxTokenStoreKey, string(rb), int(token.ExpiresIn)-200)
+	return e.store.Set(getKey(e.prefix, intervalTenant, e.wxTokenStoreKey), string(rb), int(token.ExpiresIn)-200)
 }
