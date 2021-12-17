@@ -80,6 +80,10 @@ func (m *Memory) setItem(key string, item *item) error {
 	return nil
 }
 
+func (m *Memory) HSet(key string, values ...interface{}) (bool, error) {
+	panic("implement me")
+}
+
 func (m *Memory) Del(key string) error {
 	return m.del(key)
 }

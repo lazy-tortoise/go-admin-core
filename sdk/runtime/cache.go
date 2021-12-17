@@ -31,6 +31,11 @@ type Cache struct {
 	wxTokenStoreKey string
 }
 
+func (e *Cache) HSet(key string, values ...interface{}) (bool, error) {
+	//TODO implement me
+	return e.store.HSet(key, values...)
+}
+
 // String string输出
 func (e *Cache) String() string {
 	if e.store == nil {
