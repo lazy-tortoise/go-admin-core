@@ -56,6 +56,18 @@ func (r *Redis) HSet(key string, values ...interface{}) (bool, error) {
 	return r.client.HMSet(key, values...).Result()
 }
 
+func (r *Redis) HGetAll(key string) (map[string]string, error) {
+	return r.client.HGetAll(key).Result()
+}
+
+func (r *Redis) Keys(pattern string) ([]string, error) {
+	return r.client.Keys(pattern).Result()
+}
+
+func (r *Redis) HKeys(key string) ([]string, error) {
+	return r.client.HKeys(key).Result()
+}
+
 // HashGet from key
 func (r *Redis) HashGet(hk, key string) (string, error) {
 	return r.client.HGet(hk, key).Result()

@@ -84,6 +84,18 @@ func (m *Memory) HSet(key string, values ...interface{}) (bool, error) {
 	panic("implement me")
 }
 
+func (m *Memory) HGetAll(key string) (map[string]string, error) {
+	panic("implement me")
+}
+
+func (m *Memory) Keys(pattern string) ([]string, error) {
+	panic("implement me")
+}
+
+func (m *Memory) HKeys(key string) ([]string, error) {
+	panic("implement me")
+}
+
 func (m *Memory) Del(key string) error {
 	return m.del(key)
 }

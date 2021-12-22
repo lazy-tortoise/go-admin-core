@@ -36,6 +36,21 @@ func (e *Cache) HSet(key string, values ...interface{}) (bool, error) {
 	return e.store.HSet(key, values...)
 }
 
+func (e *Cache) HGetAll(key string) (map[string]string, error) {
+	//TODO implement me
+	return e.store.HGetAll(key)
+}
+
+func (e *Cache) Keys(pattern string) ([]string, error) {
+	//TODO implement me
+	return e.store.Keys(pattern)
+}
+
+func (e *Cache) HKeys(key string) ([]string, error) {
+	//TODO implement me
+	return e.store.HKeys(key)
+}
+
 // String string输出
 func (e *Cache) String() string {
 	if e.store == nil {
