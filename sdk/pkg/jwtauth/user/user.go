@@ -45,10 +45,10 @@ func GetTenantNo(c *gin.Context) string {
 	return ""
 }
 
-func GetUserId(c *gin.Context) int {
+func GetUserId(c *gin.Context) int64 {
 	data := ExtractClaims(c)
 	if data["identity"] != nil {
-		return int((data["identity"]).(float64))
+		return int64((data["identity"]).(float64))
 	}
 	fmt.Println(pkg.GetCurrentTimeStr() + " [WARING] " + c.Request.Method + " " + c.Request.URL.Path + " GetUserId 缺少 identity")
 	return 0
