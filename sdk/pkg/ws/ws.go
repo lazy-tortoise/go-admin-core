@@ -10,8 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
 )
 
 // Manager 所有 websocket 信息
@@ -306,7 +304,7 @@ func (manager *Manager) WsClient(c *gin.Context) {
 	go client.Write(ctx)
 	time.Sleep(time.Second * 15)
 
-	pkg.FileMonitoringById(ctx, "temp/logs/job/db-20200820.log", c.Param("id"), c.Param("channel"), SendOne)
+	//pkg.FileMonitoringById(ctx, "temp/logs/job/db-20200820.log", c.Param("id"), c.Param("channel"), SendOne)
 }
 
 func (manager *Manager) UnWsClient(c *gin.Context) {
