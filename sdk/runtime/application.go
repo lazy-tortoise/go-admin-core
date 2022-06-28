@@ -54,10 +54,13 @@ func (e *Application) GetDb() map[string]*gorm.DB {
 func (e *Application) GetDbByKey(key string) *gorm.DB {
 	e.mux.Lock()
 	defer e.mux.Unlock()
+	if db, ok := e.dbs[key]; ok {
+		return db
+	}
 	if db, ok := e.dbs["*"]; ok {
 		return db
 	}
-	return e.dbs[key]
+	return nil
 }
 
 func (e *Application) SetCasbin(key string, enforcer *casbin.SyncedEnforcer) {
