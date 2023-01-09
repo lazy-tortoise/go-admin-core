@@ -1,6 +1,6 @@
 module github.com/go-admin-team/go-admin-core
 
-go 1.14
+go 1.17
 
 require (
 	github.com/BurntSushi/toml v0.3.1
